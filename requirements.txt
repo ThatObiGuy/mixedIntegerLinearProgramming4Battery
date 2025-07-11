@@ -1,0 +1,7 @@
+# Core dependencies
+gurobipy>=10.0.0  # Gurobi Python API
+pandas>=1.3.0     # For data manipulation and CSV handling
+numpy>=1.20.0     # For numerical operations
+
+# Environment configuration
+python-dotenv>=0.19.0  # For loading environment variables from .env file
