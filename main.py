@@ -25,6 +25,7 @@ def main():
         'capacity_kwh': 4.8,    # two B4850s with total capacity of 4.8 kWh
         'min_soc': 0.11,        # 11% minimum State of Charge to prevent battery damage
         'max_soc': 1,           # 100% maximum State of Charge (fully charged)
+        'initial_soc': 0.11,    # 11% initial State of Charge (can be specified by user)
         'charge_efficiency': 0.95,    # 95% efficiency when charging (accounts for energy losses)
         'discharge_efficiency': 0.95,  # 95% efficiency when discharging (accounts for energy losses)
         'max_charge_rate': 2780,    # 2780 W max charge rate - hardware limitation

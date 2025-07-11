@@ -68,12 +68,12 @@ def create_milp_model(data, battery_params, cost_params, buy_rates):
 
     for t in time_steps:
         if t == 0:
-            # Special case for initial time step (t=0) - assume battery starts at 11% SoC
+            # Special case for initial time step (t=0) - use the specified initial SoC
             # Initial stored energy = initial SoC + charging - discharging
             # Note: charging is multiplied by efficiency (< 1) and discharging is divided by efficiency (< 1)
             # Convert power (watts) to energy (kWh) using the conversion factor
             model.addConstr(
-                SE[t] == 0.11 * battery_params['capacity_kwh'] +
+                SE[t] == battery_params['initial_soc'] * battery_params['capacity_kwh'] +
                 (P_solar_battery[t] + P_grid_battery[t]) * conversion_factor * battery_params['charge_efficiency'] - 
                 P_battery_household[t] * conversion_factor / battery_params['discharge_efficiency'],
                 name=f"battery_dynamics_{t}"

@@ -75,7 +75,15 @@ The objective is to minimize the total electricity cost, considering time-of-use
 ## Customization
 
 You can customize the model by modifying the following parameters in `main.py`:
-- Battery parameters (capacity, efficiency, charge/discharge rates)
+- Battery parameters:
+  - `capacity_kwh`: Total battery capacity in kilowatt-hours
+  - `min_soc`: Minimum state of charge (e.g., 0.11 for 11%)
+  - `max_soc`: Maximum state of charge (e.g., 1.0 for 100%)
+  - `initial_soc`: Initial state of charge at the beginning of optimization (e.g., 0.11 for 11%)
+  - `charge_efficiency`: Efficiency factor when charging the battery
+  - `discharge_efficiency`: Efficiency factor when discharging the battery
+  - `max_charge_rate`: Maximum charging power in watts
+  - `max_discharge_rate`: Maximum discharging power in watts
 - Cost parameters (day rate, night rate, peak rate, sell price)
 - Solver parameters (time limit, MIP gap)
 
