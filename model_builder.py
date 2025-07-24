@@ -36,7 +36,7 @@ def create_milp_model(data, battery_params, cost_params, buy_rates):
     # Cost = (Power purchased from grid × buy rate) - (Power sold to grid × sell price)
     # Convert from watts to kWh for 5-minute intervals: multiply by (5/60)/1000 = 1/12000
     conversion_factor = (5/60)/1000  # 5 min to hours, then watts to kilowatts
-    obj = gp.quicksum(P_grid_household[t] * conversion_factor * buy_rates[t] - 
+    obj = gp.quicksum((P_grid_household[t] + P_grid_battery[t]) * conversion_factor * buy_rates[t]  -
                       P_solar_grid[t] * conversion_factor * cost_params['sell_price'] 
                       for t in time_steps)
     # Set the model's objective function to minimize the total cost
@@ -68,12 +68,12 @@ def create_milp_model(data, battery_params, cost_params, buy_rates):
 
     for t in time_steps:
         if t == 0:
-            # Special case for initial time step (t=0) - assume battery starts at 11% SoC
+            # Special case for initial time step (t=0) - use the specified initial SoC
             # Initial stored energy = initial SoC + charging - discharging
             # Note: charging is multiplied by efficiency (< 1) and discharging is divided by efficiency (< 1)
             # Convert power (watts) to energy (kWh) using the conversion factor
             model.addConstr(
-                SE[t] == 0.11 * battery_params['capacity_kwh'] +
+                SE[t] == battery_params['initial_soc'] * battery_params['capacity_kwh'] +
                 (P_solar_battery[t] + P_grid_battery[t]) * conversion_factor * battery_params['charge_efficiency'] - 
                 P_battery_household[t] * conversion_factor / battery_params['discharge_efficiency'],
                 name=f"battery_dynamics_{t}"
@@ -94,7 +94,7 @@ def create_milp_model(data, battery_params, cost_params, buy_rates):
         model.addConstr(
             SE[t] >= battery_params['min_soc'] * battery_params['capacity_kwh'],
             name=f"soc_min_{t}"
-        )# TODO: Check this out using kwh and watts?!
+        )# TODO: Revisit this
         # Maximum state of charge constraint - prevents battery from overcharging
         model.addConstr(
             SE[t] <= battery_params['max_soc'] * battery_params['capacity_kwh'],

@@ -10,54 +10,55 @@ from solver import solve_milp, extract_results, save_results, print_summary
 def main():
     # Data file path - specifies location of the CSV containing time series data for solar production and load demand
     # Using os.path.join ensures correct path formatting across different operating systems
-    data_file = os.path.join("..", "Data", "site1", "ComparisonDays", "2023-06-21.csv")
-    
+    data_file = os.path.join("..", "Data", "site2", "Comparisons", "2020June21_22.csv")
+
     # Load_data - reads the CSV file and extracts relevant time series data for the optimization
     # The load_data function parses timestamps, solar production, and household demand
     print("Loading data...")
     data = load_data(data_file)
     print(f"Loaded {len(data['time'])} time steps")
-    
+
     # Battery parameters - defines the technical specifications and constraints of the battery system
     # These parameters are based on the specific battery installation at site 1 (two B4850 batteries)
     # These values determine the battery's behavior in the optimization model
     battery_params = {
         'capacity_kwh': 4.8,    # two B4850s with total capacity of 4.8 kWh
-        'min_soc': 0.11,        # 11% minimum State of Charge to prevent battery damage
+        'min_soc': 0,        # 0% minimum State of Charge (often higher to prevent battery damage)
         'max_soc': 1,           # 100% maximum State of Charge (fully charged)
+        'initial_soc': 0.34,    # 34% initial State of Charge (should be matched to actual data for fair comparison)
         'charge_efficiency': 0.95,    # 95% efficiency when charging (accounts for energy losses)
         'discharge_efficiency': 0.95,  # 95% efficiency when discharging (accounts for energy losses)
-        'max_charge_rate': 2780,    # 2780 W max charge rate - hardware limitation
-        'max_discharge_rate': 2370,  # 2370 W max discharge rate - hardware limitation
+        'max_charge_rate': 3300,    # 3300 W max charge rate - hardware limitation - found via
+        'max_discharge_rate': 3116,  # 3116 W max discharge rate - hardware limitation - found via ORDER BY discharging_power_w
     }
-    
+
     # Cost parameters - defines the electricity pricing structure for the optimization
     # These values are based on Energia's time-of-use tariff rates in euros per kWh
     cost_params = {
-        'day_rate': 0.3762,     # €0.3762/kWh grid purchase price during standard daytime hours
-        'night_rate': 0.2147,   # €0.2147/kWh grid purchase price during night hours (cheaper)
-        'peak_rate': 0.3943,    # €0.3943/kWh grid purchase price during peak demand hours (most expensive)
-        'sell_price': 0.20,     # €0.20/kWh feed-in tariff for selling excess solar power back to the grid
+        'day_rate': 0.3762,  # €0.3762/kWh grid purchase price during standard daytime hours
+        'night_rate': 0.2147,  # €0.2147/kWh grid purchase price during night hours (cheaper)
+        'peak_rate': 0.3943,  # €0.3943/kWh grid purchase price during peak demand hours (most expensive)
+        'sell_price': 0.20,  # €0.20/kWh feed-in tariff for selling excess solar power back to the grid
     }
-    
+
     # Get time-of-use rates - creates a mapping between each time step and the appropriate electricity rate
     # This function assigns day/night/peak rates to each time period based on the hour of day
     # The resulting dictionary is used in the objective function to calculate accurate costs
     buy_rates = get_time_of_use_rates(data, cost_params)
-    
+
     # Create model - builds the complete Mixed Integer Linear Programming (MILP) model using Gurobi
     # This function defines all decision variables, constraints, and the objective function
     # Returns both the model object and a dictionary containing all decision variables for later access
     print("Creating MILP model with Gurobi...")
     model, vars_dict = create_milp_model(data, battery_params, cost_params, buy_rates)
-    
+
     # Solve model - uses Gurobi's optimization engine to find the optimal solution
     # We set a time limit of 300 seconds (5 minutes) and accept solutions within 1% of optimal (MIP gap)
     # These parameters balance solution quality with computation time
     print("Solving MILP model...")
     if solve_milp(model, time_limit=300, gap=0.01):  # 5 minutes time limit, 1% MIP gap
         print("Model solved successfully!")
-        
+
         # Extract results - pulls the optimal values from the solved model into a structured dictionary
         # This includes all power flows, battery state of charge, and other key metrics
         results = extract_results(model, vars_dict, data, battery_params)
@@ -69,7 +70,7 @@ def main():
         # Print summary - displays key performance metrics from the optimization
         # This includes total cost, average battery state of charge, and energy flows
         print_summary(results)
-        
+
     else:
         print("Failed to solve the model")
 
