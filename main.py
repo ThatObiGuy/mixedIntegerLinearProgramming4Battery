@@ -6,6 +6,15 @@ from data_loader import load_data, get_time_of_use_rates
 from model_builder import create_milp_model
 from solver import solve_milp, extract_results, save_results, print_summary
 
+# Cost parameters - defines the electricity pricing structure for the optimization
+# These values are based on Energia's time-of-use tariff rates in euros per kWh
+cost_params = {
+    'day_rate': 0.3762,  # €0.3762/kWh grid purchase price during standard daytime hours
+    'night_rate': 0.2147,  # €0.2147/kWh grid purchase price during night hours (cheaper)
+    'peak_rate': 0.3943,  # €0.3943/kWh grid purchase price during peak demand hours (most expensive)
+    'sell_price': 0.20,  # €0.20/kWh feed-in tariff for selling excess solar power back to the grid
+}
+
 # The main function orchestrates the entire optimization process from data loading to results output
 def main():
     # Data file path - specifies location of the CSV containing time series data for solar production and load demand
@@ -30,15 +39,6 @@ def main():
         'discharge_efficiency': 0.95,  # 95% efficiency when discharging (accounts for energy losses)
         'max_charge_rate': 3300,    # 3300 W max charge rate - hardware limitation - found via
         'max_discharge_rate': 3116,  # 3116 W max discharge rate - hardware limitation - found via ORDER BY discharging_power_w
-    }
-
-    # Cost parameters - defines the electricity pricing structure for the optimization
-    # These values are based on Energia's time-of-use tariff rates in euros per kWh
-    cost_params = {
-        'day_rate': 0.3762,  # €0.3762/kWh grid purchase price during standard daytime hours
-        'night_rate': 0.2147,  # €0.2147/kWh grid purchase price during night hours (cheaper)
-        'peak_rate': 0.3943,  # €0.3943/kWh grid purchase price during peak demand hours (most expensive)
-        'sell_price': 0.20,  # €0.20/kWh feed-in tariff for selling excess solar power back to the grid
     }
 
     # Get time-of-use rates - creates a mapping between each time step and the appropriate electricity rate
