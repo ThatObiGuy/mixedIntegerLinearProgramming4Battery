@@ -59,8 +59,8 @@ def calculate_summary(df, cost_params):
     for i, timestamp in enumerate(df['time']):
         hour = timestamp.hour
         # Determine the appropriate rate based on time of day
-        if 17 <= hour < 19:  # Peak: 17:00 to 19:00
-            rate = cost_params['peak_rate']
+        if 2 <= hour < 4:  # Boost: 02:00 to 04:00
+            rate = cost_params['boost_rate']
         elif 23 <= hour or hour < 8:  # Night: 23:00 to 08:00
             rate = cost_params['night_rate']
         else:  # Day: all other times
@@ -128,7 +128,7 @@ def print_summary(summary):
 
 def main():
     # Specify the file path directly in the code
-    file_path = os.path.join("..", "Data", "site2", "Comparisons", "2020June21_MILP.csv")
+    file_path = os.path.join("..", "Data", "site1", "Comparisons", "2023June21_MILP.csv")
 
     # Load data
     print(f"Loading data from {file_path}...")
@@ -139,7 +139,7 @@ def main():
     print(f"Calculating summary with dynamic cost parameters:")
     print(f"  Day rate: €{cost_params['day_rate']}/kWh")
     print(f"  Night rate: €{cost_params['night_rate']}/kWh")
-    print(f"  Peak rate: €{cost_params['peak_rate']}/kWh")
+    print(f"  Boost rate: €{cost_params['boost_rate']}/kWh")
     print(f"  Sell price: €{cost_params['sell_price']}/kWh")
     summary = calculate_summary(df, cost_params)
 
