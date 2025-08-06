@@ -96,7 +96,7 @@ def calculate_summary(df, cost_params):
     # Grid Emission Factor: 0.331 kg CO2 per kWh - Irish average
     gef = 0.331
     # total_solar_utilized is already in kWh
-    co2_produced = (total_energy_purchased - production_power_kwh) * gef
+    co2_produced = total_energy_purchased * gef
 
     return {
         'total_energy_consumed' : total_consumption,
@@ -128,7 +128,7 @@ def print_summary(summary):
 
 def main():
     # Specify the file path directly in the code
-    file_path = os.path.join("..", "Data", "site1", "Comparisons", "2023June21_MILP.csv")
+    file_path = os.path.join("..", "Data", "site1", "Comparisons", "2023JuneALL_MILP.csv")
 
     # Load data
     print(f"Loading data from {file_path}...")

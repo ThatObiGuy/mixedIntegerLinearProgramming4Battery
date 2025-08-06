@@ -49,8 +49,8 @@ def calculate_summary(df, cost_params):
     for i, timestamp in enumerate(df['updated_time']):
         hour = timestamp.hour
         # Determine the appropriate rate based on time of day
-        if 17 <= hour < 19:  # Peak: 17:00 to 19:00
-            rate = cost_params['peak_rate']
+        if 2 <= hour < 4:  # Boost: 02:00 to 04:00
+            rate = cost_params['boost_rate']
         elif 23 <= hour or hour < 8:  # Night: 23:00 to 08:00
             rate = cost_params['night_rate']
         else:  # Day: all other times
@@ -85,7 +85,7 @@ def calculate_summary(df, cost_params):
     # Grid Emission Factor: 0.331 kg CO2 per kWh - Irish average
     gef = 0.331
     # total_solar_utilized is already in kWh
-    co2_produced = (total_energy_purchased - production_power_kwh) * gef
+    co2_produced = total_energy_purchased * gef
 
     return {
         'total_energy_consumed': total_consumption,
@@ -121,7 +121,7 @@ def print_summary(summary):
 
 def main():
     # Specify the file path directly in the code
-    file_path = os.path.join("..", "Data", "site2", "Comparisons", "2020June21.csv")
+    file_path = os.path.join("..", "Data", "site2", "Comparisons", "2020December.csv")
 
     # Load data
     print(f"Loading data from {file_path}...")
@@ -132,7 +132,7 @@ def main():
     print(f"Calculating summary with dynamic cost parameters:")
     print(f"  Day rate: €{cost_params['day_rate']}/kWh")
     print(f"  Night rate: €{cost_params['night_rate']}/kWh")
-    print(f"  Peak rate: €{cost_params['peak_rate']}/kWh")
+    print(f"  Boost rate: €{cost_params['boost_rate']}/kWh")
     print(f"  Sell price: €{cost_params['sell_price']}/kWh")
     summary = calculate_summary(df, cost_params)
 

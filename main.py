@@ -20,7 +20,7 @@ cost_params = {
 def main():
     # Data file path - specifies location of the CSV containing time series data for solar production and load demand
     # Using os.path.join ensures correct path formatting across different operating systems
-    data_file = os.path.join("..", "Data", "site1", "Comparisons", "2023June21_22.csv")
+    data_file = os.path.join("..", "Data", "site2", "Comparisons", "2020March.csv")
 
     # Load_data - reads the CSV file and extracts relevant time series data for the optimization
     # The load_data function parses timestamps, solar production, and household demand
@@ -35,7 +35,7 @@ def main():
         'capacity_kwh': 4.8,    # two B4850s with total capacity of 4.8 kWh
         'min_soc': 0.11,        # 11% minimum State of Charge to prevent battery damage
         'max_soc': 1,           # 100% maximum State of Charge (fully charged)
-        'initial_soc': 0.72,    # 72% initial State of Charge (should be matched to actual data for fair comparison)
+        'initial_soc': 0.19,    # initial State of Charge (should be matched to actual data for fair comparison)
         'charge_efficiency': 0.95,    # 95% efficiency when charging (accounts for energy losses)
         'discharge_efficiency': 0.95,  # 95% efficiency when discharging (accounts for energy losses)
         'max_charge_rate': 2780,    # 2780 W max charge rate - hardware limitation
