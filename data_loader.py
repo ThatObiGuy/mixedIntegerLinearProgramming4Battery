@@ -31,8 +31,8 @@ def get_time_of_use_rates(data, cost_params):
     # Looks through the data and maps each time value to a rate - using t as an index
     for t in range(len(data['time'])):
         hour = data['time'][t].hour
-        if 2 <= hour < 4:  # Boost: 02:00 to 04:00
-            buy_rates[t] = cost_params['boost_rate']
+        if 17 <= hour < 19:  # Peak: 17:00 to 19:00
+            buy_rates[t] = cost_params['peak_rate']
         elif 23 <= hour or hour < 8:  # Night: 23:00 to 08:00
             buy_rates[t] = cost_params['night_rate']
         else:  # Day: all other times
