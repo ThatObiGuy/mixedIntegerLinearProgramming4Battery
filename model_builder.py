@@ -36,7 +36,7 @@ def create_milp_model(data, battery_params, cost_params, buy_rates):
     # Cost = (Power purchased from grid × buy rate) - (Power sold to grid × sell price)
     # Convert from watts to kWh for 5-minute intervals: multiply by (5/60)/1000 = 1/12000
     conversion_factor = (5/60)/1000  # 5 min to hours, then watts to kilowatts
-    obj = gp.quicksum(P_grid_household[t] * conversion_factor * buy_rates[t] - 
+    obj = gp.quicksum((P_grid_household[t] + P_grid_battery[t]) * conversion_factor * buy_rates[t] -
                       P_solar_grid[t] * conversion_factor * cost_params['sell_price'] 
                       for t in time_steps)
 

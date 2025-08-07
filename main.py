@@ -6,6 +6,16 @@ from data_loader import load_data, get_time_of_use_rates
 from model_builder import create_milp_model
 from solver import solve_milp, extract_results, save_results, print_summary
 
+# Cost parameters - defines the electricity pricing structure for the optimization
+# These values are based on Electric Ireland's 'Home electric + night boost' tariff rates in euros per kWh
+cost_params = {
+    'day_rate': 0.3634,  # €0.3634/kWh grid purchase price during standard daytime hours
+    'night_rate': 0.1792,  # €0.1792/kWh grid purchase price during night hours (cheaper)
+    'boost_rate': 0.1052,  # €0.1052/kWh grid purchase price during night boost hours (cheapest)
+    'sell_price': 0.195,  # €0.195/kWh feed-in tariff for selling excess solar power back to the grid
+    'wear_price': 0.05,  # €/kWh, linear throughput penalty
+}
+
 # The main function orchestrates the entire optimization process from data loading to results output
 def main():
     # Data file path - specifies location of the CSV containing time series data for solar production and load demand
@@ -30,16 +40,6 @@ def main():
         'discharge_efficiency': 0.95,  # 95% efficiency when discharging (accounts for energy losses)
         'max_charge_rate': 2780,    # 2780 W max charge rate - hardware limitation
         'max_discharge_rate': 2370,  # 2370 W max discharge rate - hardware limitation
-    }
-    
-    # Cost parameters - defines the electricity pricing structure for the optimization
-    # These values are based on Electric Ireland's 'Home electric + night boost' tariff rates in euros per kWh
-    cost_params = {
-        'day_rate': 0.3634,     # €0.3634/kWh grid purchase price during standard daytime hours
-        'night_rate': 0.1792,   # €0.1792/kWh grid purchase price during night hours (cheaper)
-        'boost_rate': 0.1052,    # €0.1052/kWh grid purchase price during night boost hours (cheapest)
-        'sell_price': 0.195,     # €0.195/kWh feed-in tariff for selling excess solar power back to the grid
-        'wear_price': 0.05,  # €/kWh, linear throughput penalty
     }
     
     # Get time-of-use rates - creates a mapping between each time step and the appropriate electricity rate
