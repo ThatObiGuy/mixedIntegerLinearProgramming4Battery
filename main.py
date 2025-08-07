@@ -10,7 +10,7 @@ from solver import solve_milp, extract_results, save_results, print_summary
 def main():
     # Data file path - specifies location of the CSV containing time series data for solar production and load demand
     # Using os.path.join ensures correct path formatting across different operating systems
-    data_file = os.path.join("..", "Data", "site1", "ComparisonDays", "2023-June-Solstice.csv")
+    data_file = os.path.join("..", "Data", "site1", "Comparisons", "2023June21_22.csv")
 
     # Load_data - reads the CSV file and extracts relevant time series data for the optimization
     # The load_data function parses timestamps, solar production, and household demand
@@ -25,7 +25,7 @@ def main():
         'capacity_kwh': 4.8,    # two B4850s with total capacity of 4.8 kWh
         'min_soc': 0.11,        # 11% minimum State of Charge to prevent battery damage
         'max_soc': 1,           # 100% maximum State of Charge (fully charged)
-        'initial_soc': 0.22,    # 22% initial State of Charge (should be matched to actual data for fair comparison)
+        'initial_soc': 0.72,    # 72% initial State of Charge (should be matched to actual data for fair comparison)
         'charge_efficiency': 0.95,    # 95% efficiency when charging (accounts for energy losses)
         'discharge_efficiency': 0.95,  # 95% efficiency when discharging (accounts for energy losses)
         'max_charge_rate': 2780,    # 2780 W max charge rate - hardware limitation
@@ -39,6 +39,7 @@ def main():
         'night_rate': 0.1792,   # €0.1792/kWh grid purchase price during night hours (cheaper)
         'boost_rate': 0.1052,    # €0.1052/kWh grid purchase price during night boost hours (cheapest)
         'sell_price': 0.195,     # €0.195/kWh feed-in tariff for selling excess solar power back to the grid
+        'wear_price': 0.05,  # €/kWh, linear throughput penalty
     }
     
     # Get time-of-use rates - creates a mapping between each time step and the appropriate electricity rate
@@ -53,10 +54,10 @@ def main():
     model, vars_dict = create_milp_model(data, battery_params, cost_params, buy_rates)
     
     # Solve model - uses Gurobi's optimization engine to find the optimal solution
-    # We set a time limit of 300 seconds (5 minutes) and accept solutions within 1% of optimal (MIP gap)
+    # We set a time limit of 600 seconds (10 minutes)
     # These parameters balance solution quality with computation time
     print("Solving MILP model...")
-    if solve_milp(model, time_limit=300, gap=0.01):  # 5 minutes time limit, 1% MIP gap
+    if solve_milp(model, time_limit=600, gap=0):  # 10 minutes time limit, no gap - optimal solution, or closest within 10 minutes
         print("Model solved successfully!")
         
         # Extract results - pulls the optimal values from the solved model into a structured dictionary

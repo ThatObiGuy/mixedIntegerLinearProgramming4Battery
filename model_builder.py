@@ -39,6 +39,13 @@ def create_milp_model(data, battery_params, cost_params, buy_rates):
     obj = gp.quicksum(P_grid_household[t] * conversion_factor * buy_rates[t] - 
                       P_solar_grid[t] * conversion_factor * cost_params['sell_price'] 
                       for t in time_steps)
+
+    # Battery wear cost (throughput penalty)
+    obj += gp.quicksum(
+        (P_solar_battery[t] + P_grid_battery[t] + P_battery_household[t])
+        * conversion_factor * cost_params['wear_price']
+        for t in time_steps)
+
     # Set the model's objective function to minimize the total cost
     model.setObjective(obj, GRB.MINIMIZE)
 
